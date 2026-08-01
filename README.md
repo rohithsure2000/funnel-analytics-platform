@@ -1,5 +1,9 @@
 # Marketing Funnel & Experiment Analytics
 
+![CI](https://github.com/rohithsure2000/funnel-analytics-platform/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+
 End-to-end analytics platform on a real, public e-commerce dataset: builds
 a customer conversion funnel, measures where customers drop off, and
 evaluates a 3-arm onboarding/checkout experiment (Control / Variant_A /
@@ -8,6 +12,41 @@ source data that would have quietly produced a wrong analysis if ignored.
 
 Built by **[Rohith Sure](https://github.com/rohithsure2000)** — Data
 Analyst / Data Scientist (MS Data Science, Stevens Institute of Technology).
+
+**Live demo:** _add your Streamlit Community Cloud link here once deployed
+— see "Deploying the live demo" below_
+
+## Skills demonstrated
+
+- **SQL** — schema design, window functions, multi-table joins (`sql/`)
+- **Statistical testing** — chi-square, two-proportion z-tests with a
+  Bonferroni correction, and a customer-clustered bootstrap for a
+  pseudo-replication check (`src/ab_testing.py`)
+- **Data quality diagnosis** — caught and worked around two real issues
+  in the source data instead of taking column names at face value (see
+  below)
+- **ETL / pipeline design** — validation, cleaning, and idempotent
+  loading (`src/pipeline.py`)
+- **Python** — pandas, NumPy, SciPy, Matplotlib, Plotly
+- **Dashboarding** — interactive Streamlit app with a live/demo-mode
+  fallback (`dashboard/app.py`)
+- **R** — an equivalent implementation of the core statistical test
+  (`analysis/ab_test.R`)
+
+## Quick look
+
+![Customer lifecycle funnel](reports/figures/overall_funnel.png)
+
+| | |
+|---|---:|
+| Customers analyzed | 99,997 |
+| Ever purchased | 64,035 (64.0%) |
+| Biggest drop-off | Cart → purchase (32.0%) |
+| Avg. revenue / converted customer | $146.31 |
+| Best experiment arm | Variant_B, **+1.56pp** over Control (p < 0.0001) |
+
+Full breakdown, methodology, and the two data-quality findings that shaped
+this analysis are below.
 
 ## The data
 
@@ -84,8 +123,6 @@ required (see `src/db.py`).
 | Added to cart | 94,228 | 94.2% | 3.6% |
 | **Purchased** | **64,035** | **64.0%** | **32.0%** |
 
-![Customer lifecycle funnel](reports/figures/overall_funnel.png)
-
 Bounce rate (share of all events that are `bounce`): **9.5%**. Average
 lifetime revenue per converted customer: **$146.31**. The steepest
 drop-off by far is cart → purchase — nearly a third of customers who add
@@ -142,11 +179,13 @@ funnel-analytics-platform/
 │   ├── pipeline.py                 # ETL: validate + clean + load
 │   ├── sessionize.py                # derive real sessions from timestamps
 │   ├── funnel_analysis.py            # customer lifecycle funnel + charts
-│   └── ab_testing.py                 # 3-group test + clustered bootstrap
+│   ├── ab_testing.py                 # 3-group test + clustered bootstrap
+│   └── export_demo_data.py            # snapshot results for cloud deployment
 ├── analysis/
 │   └── ab_test.R                      # R equivalent of the core test
 ├── dashboard/
-│   └── app.py                          # Streamlit dashboard
+│   ├── app.py                          # Streamlit dashboard (live + demo mode)
+│   └── demo_data/                       # precomputed results for cloud deployment
 ├── tests/
 │   ├── test_sessionize.py
 │   ├── test_funnel_analysis.py
@@ -188,6 +227,7 @@ python -m src.pipeline           # clean, sessionize, and load into the warehous
 python -m src.sessionize         # (optional) sanity-check the session lengths
 python -m src.funnel_analysis    # prints the funnel table, saves charts
 python -m src.ab_testing         # prints the experiment results
+python -m src.export_demo_data   # (optional) refresh dashboard/demo_data/ for cloud deployment
 # or, equivalently, the core test in R:
 Rscript analysis/ab_test.R data/processed/warehouse.db
 ```
@@ -197,6 +237,24 @@ Rscript analysis/ab_test.R data/processed/warehouse.db
 ```bash
 streamlit run dashboard/app.py
 ```
+If `data/processed/warehouse.db` exists (i.e. you've run the pipeline),
+the dashboard queries it live. Otherwise it automatically falls back to
+the precomputed results in `dashboard/demo_data/` and shows a banner
+saying so — this is what makes the cloud deployment below possible
+without bundling the real ~200MB dataset.
+
+### Deploying the live demo
+
+Since `dashboard/app.py` falls back to `dashboard/demo_data/` when there's
+no local warehouse, it can be deployed as-is to
+[Streamlit Community Cloud](https://streamlit.io/cloud) (free) without
+needing the real dataset present in the cloud environment:
+
+1. Push this repo to GitHub (steps below, if not done yet).
+2. Go to share.streamlit.io, sign in with GitHub, click "New app."
+3. Point it at this repo, branch `main`, file path `dashboard/app.py`.
+4. Deploy. It'll show the demo-mode banner and the precomputed real results.
+5. Copy the resulting URL into the "Live demo" line at the top of this README.
 
 ### Run with Docker
 

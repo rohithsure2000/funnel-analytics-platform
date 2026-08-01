@@ -1,0 +1,5 @@
+step_name,customers_reached,pct_of_customers,step_over_step_pct,drop_off_pct
+view,99997,100.0,100.0,0.0
+click,97725,97.72,97.73,2.27
+add_to_cart,94228,94.23,96.42,3.58
+purchase,64035,64.04,67.96,32.04

@@ -1,0 +1,21 @@
+acquisition_channel,step_name,customers_reached,pct_of_signups
+Email,view,14903,100.0
+Email,click,14580,97.83
+Email,add_to_cart,14004,93.97
+Email,purchase,9499,63.74
+Organic,view,30199,100.0
+Organic,click,29479,97.61
+Organic,add_to_cart,28449,94.2
+Organic,purchase,19370,64.14
+Paid Search,view,29948,99.99
+Paid Search,click,29272,97.74
+Paid Search,add_to_cart,28231,94.26
+Paid Search,purchase,19251,64.28
+Referral,view,9968,100.0
+Referral,click,9767,97.98
+Referral,add_to_cart,9409,94.39
+Referral,purchase,6330,63.5
+Social,view,14979,100.0
+Social,click,14627,97.65
+Social,add_to_cart,14135,94.37
+Social,purchase,9585,63.99

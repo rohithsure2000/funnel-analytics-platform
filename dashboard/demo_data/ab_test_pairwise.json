@@ -1,0 +1,32 @@
+[
+  {
+    "group_a": "Control",
+    "group_b": "Variant_A",
+    "rate_a": 0.04744226487895568,
+    "rate_b": 0.05242730056076908,
+    "absolute_lift_pp": 0.49850356818134034,
+    "z_stat": 12.70096015595637,
+    "p_value": 0.0,
+    "significant": true
+  },
+  {
+    "group_a": "Control",
+    "group_b": "Variant_B",
+    "rate_a": 0.04744226487895568,
+    "rate_b": 0.06303865981313549,
+    "absolute_lift_pp": 1.559639493417981,
+    "z_stat": 38.70592198657145,
+    "p_value": 0.0,
+    "significant": true
+  },
+  {
+    "group_a": "Variant_A",
+    "group_b": "Variant_B",
+    "rate_a": 0.05242730056076908,
+    "rate_b": 0.06303865981313549,
+    "absolute_lift_pp": 1.0611359252366406,
+    "z_stat": 20.367984007933906,
+    "p_value": 0.0,
+    "significant": true
+  }
+]

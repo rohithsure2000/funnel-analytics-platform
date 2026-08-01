@@ -1,0 +1,4 @@
+experiment_group,total_events,purchase_events,purchase_rate
+Control,1198404,56855,0.04744226487895568
+Variant_A,401413,21045,0.05242730056076908
+Variant_B,400183,25227,0.06303865981313549
