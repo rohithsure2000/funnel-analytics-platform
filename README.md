@@ -13,8 +13,7 @@ source data that would have quietly produced a wrong analysis if ignored.
 Built by **[Rohith Sure](https://github.com/rohithsure2000)** — Data
 Analyst / Data Scientist (MS Data Science, Stevens Institute of Technology).
 
-**Live demo:** _add your Streamlit Community Cloud link here once deployed
-— see "Deploying the live demo" below_
+**Live demo:** [funnel-analytics-platform-9khfvyseacab88ff8wfshk.streamlit.app](https://funnel-analytics-platform-9khfvyseacab88ff8wfshk.streamlit.app)
 
 ## Skills demonstrated
 
@@ -37,13 +36,13 @@ Analyst / Data Scientist (MS Data Science, Stevens Institute of Technology).
 
 ![Customer lifecycle funnel](reports/figures/overall_funnel.png)
 
-| | |
-|---|---:|
-| Customers analyzed | 99,997 |
-| Ever purchased | 64,035 (64.0%) |
-| Biggest drop-off | Cart → purchase (32.0%) |
-| Avg. revenue / converted customer | $146.31 |
-| Best experiment arm | Variant_B, **+1.56pp** over Control (p < 0.0001) |
+|                                   |                                                  |
+| --------------------------------- | -----------------------------------------------: |
+| Customers analyzed                |                                           99,997 |
+| Ever purchased                    |                                   64,035 (64.0%) |
+| Biggest drop-off                  |                          Cart → purchase (32.0%) |
+| Avg. revenue / converted customer |                                          $146.31 |
+| Best experiment arm               | Variant_B, **+1.56pp** over Control (p < 0.0001) |
 
 Full breakdown, methodology, and the two data-quality findings that shaped
 this analysis are below.
@@ -66,8 +65,8 @@ Both of these were caught by checking the data rather than assuming it
 behaved the way its column names suggested — worth reading since they
 directly determined how the funnel and the experiment are analyzed below.
 
-**1. `session_id` isn't a real visit identifier.** 84% of session_id
-values are shared across *multiple different customers*, sometimes years
+**1. `session_id` isn't a real visit identifier.** 84% of session*id
+values are shared across \_multiple different customers*, sometimes years
 apart. I tried deriving real sessions from timestamps instead (a standard
 technique: a new session starts after a 30-minute gap in a customer's
 activity — see `src/sessionize.py`), and found the data doesn't actually
@@ -79,7 +78,7 @@ session-based funnel the data can't support, this project measures a
 they ever reach each stage — which is a standard and honest way to frame
 a funnel when session data isn't trustworthy.
 
-**2. `experiment_group` is assigned per *event*, not per *customer*.**
+**2. `experiment_group` is assigned per _event_, not per _customer_.**
 99.96% of customers show more than one experiment group across their
 event history, so it can't be read as a traditional sticky A/B cohort.
 Rather than either ignoring this or discarding the field, this project
@@ -116,12 +115,12 @@ required (see `src/db.py`).
 
 ### Customer lifecycle funnel
 
-| Stage | Customers reached | % of total | Step-over-step drop |
-|---|---:|---:|---:|
-| Viewed a product | 99,997 | 100.0% | — |
-| Clicked | 97,725 | 97.7% | 2.3% |
-| Added to cart | 94,228 | 94.2% | 3.6% |
-| **Purchased** | **64,035** | **64.0%** | **32.0%** |
+| Stage            | Customers reached | % of total | Step-over-step drop |
+| ---------------- | ----------------: | ---------: | ------------------: |
+| Viewed a product |            99,997 |     100.0% |                   — |
+| Clicked          |            97,725 |      97.7% |                2.3% |
+| Added to cart    |            94,228 |      94.2% |                3.6% |
+| **Purchased**    |        **64,035** |  **64.0%** |           **32.0%** |
 
 Bounce rate (share of all events that are `bounce`): **9.5%**. Average
 lifetime revenue per converted customer: **$146.31**. The steepest
@@ -135,11 +134,11 @@ acquisition channels) — a genuinely flat result, not a rounding artifact.
 
 ### Experiment: Control vs. Variant_A vs. Variant_B
 
-| Group | Events | Purchase rate |
-|---|---:|---:|
-| Control | 1,198,404 | 4.74% |
-| Variant_A | 401,413 | 5.24% |
-| Variant_B | 400,183 | 6.30% |
+| Group     |    Events | Purchase rate |
+| --------- | --------: | ------------: |
+| Control   | 1,198,404 |         4.74% |
+| Variant_A |   401,413 |         5.24% |
+| Variant_B |   400,183 |         6.30% |
 
 3-group chi-square test: **χ² = 1,499.9, p < 0.0001**. Pairwise
 (Bonferroni-corrected α = 0.0167): all three pairs differ significantly,
@@ -148,10 +147,10 @@ points**, p < 0.0001).
 
 **Customer-clustered bootstrap** (2,000 resamples, robustness check):
 
-| Comparison | Median lift | 95% CI |
-|---|---:|---:|
-| Variant_A vs Control | +0.50 pp | [0.42, 0.58] |
-| Variant_B vs Control | +1.56 pp | [1.48, 1.64] |
+| Comparison           | Median lift |       95% CI |
+| -------------------- | ----------: | -----------: |
+| Variant_A vs Control |    +0.50 pp | [0.42, 0.58] |
+| Variant_B vs Control |    +1.56 pp | [1.48, 1.64] |
 
 The bootstrap CIs closely match the naive event-level test, which is why
 the headline result is reported with reasonable confidence despite the
@@ -201,6 +200,7 @@ funnel-analytics-platform/
 ## Getting started
 
 ### Prerequisites
+
 - Python 3.11+
 - The dataset — see [`data/README.md`](data/README.md) for the download
   link and setup (not included in this repo)
@@ -237,6 +237,7 @@ Rscript analysis/ab_test.R data/processed/warehouse.db
 ```bash
 streamlit run dashboard/app.py
 ```
+
 If `data/processed/warehouse.db` exists (i.e. you've run the pipeline),
 the dashboard queries it live. Otherwise it automatically falls back to
 the precomputed results in `dashboard/demo_data/` and shows a banner
@@ -269,6 +270,7 @@ docker run -p 8501:8501 -v $(pwd)/data/raw:/app/data/raw funnel-analytics
 ```bash
 pytest -v
 ```
+
 Tests use small hand-crafted fixtures, not the real dataset, so they run
 without downloading anything.
 
@@ -283,6 +285,7 @@ file — open it with any SQLite client and run the queries in
 This repo includes a Streamlit dashboard so it's runnable end-to-end
 without a BI license. To point **Tableau** or **Power BI** at the same
 data instead:
+
 - Point either tool's SQLite/ODBC connector at `data/processed/warehouse.db`, or
 - In production (`DB_BACKEND=snowflake`), connect Tableau/Power BI's native
   Snowflake connector to the same tables and reuse `sql/funnel_queries.sql`
@@ -302,7 +305,7 @@ data instead:
   mismatch) test on the 60/20/20 split before trusting any lift number in
   a real deployment.
 - **Revenue-weighted lift:** the current experiment analysis is on
-  purchase *rate*; joining to `fct_transactions` for a revenue-per-event
+  purchase _rate_; joining to `fct_transactions` for a revenue-per-event
   lift would be a natural next metric.
 - **Alerting:** `.env.example` includes placeholders for a Slack
   webhook/email so a scheduled job could flag a funnel-stage regression
