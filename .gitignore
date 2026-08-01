@@ -1,0 +1,25 @@
+# Environment
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Data & warehouse -- see data/README.md for how to download the real
+# dataset. Not committed: events.csv alone is ~180MB, and it's better
+# practice to point at the canonical Kaggle source than vendor a copy.
+data/raw/*.csv
+data/processed/*.db
+
+# Note: reports/figures/*.png are intentionally NOT ignored -- they're
+# committed so charts render directly in the README on GitHub.
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
