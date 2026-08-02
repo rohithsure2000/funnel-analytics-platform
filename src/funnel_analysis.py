@@ -1,18 +1,13 @@
 """
 funnel_analysis.py
 -------------------
-Customer-lifecycle funnel analysis.
+Customer-lifecycle funnel: across a customer's entire history, did they
+ever reach each stage (view -> click -> add_to_cart -> purchase)?
 
-Note on methodology: an earlier version of this analysis assumed a
-per-visit ("session") funnel. We checked that empirically (see
-src/sessionize.py and data/README.md) and found the source data has no
-recoverable session structure -- a given customer's events are spread
-with a median 36-day gap, not clustered into visits. So this funnel asks
-a different, still standard, question: across a customer's *entire*
-history, did they ever reach each successive stage? (view -> click ->
-add_to_cart -> purchase). `bounce` is tracked separately as a rate, not
-a funnel step, since it's a terminal non-progression outcome rather than
-a stage customers pass through.
+Not a per-visit funnel -- see src/sessionize.py / data/README.md for why
+(source data has no recoverable session structure, median 36-day gap
+between a customer's events). `bounce` is reported as a rate, not a
+funnel step, since it's a terminal outcome rather than a stage.
 
 Run:
     python -m src.funnel_analysis

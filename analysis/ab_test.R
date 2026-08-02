@@ -1,12 +1,11 @@
 # ab_test.R
 #
-# R equivalent of src/ab_testing.py's headline test: a 3-group chi-squared
-# test across Control / Variant_A / Variant_B on purchase-vs-not at the
-# event level, followed by pairwise 2-sample proportion tests with a
-# Bonferroni correction. See src/ab_testing.py's module docstring for why
-# the event level is the right unit here (experiment_group is assigned
-# per-event, not persisted per customer) and for the customer-clustered
-# bootstrap robustness check, which this script does not duplicate.
+# R equivalent of src/ab_testing.py's headline test: 3-group chi-squared
+# test on purchase-vs-not at the event level, then pairwise 2-sample
+# proportion tests with a Bonferroni correction. experiment_group is
+# assigned per-event, not per-customer (see src/ab_testing.py's docstring
+# for why that's the right unit) -- this script doesn't duplicate the
+# customer-clustered bootstrap check, just the core test.
 #
 # Usage:
 #   Rscript analysis/ab_test.R path/to/warehouse.db

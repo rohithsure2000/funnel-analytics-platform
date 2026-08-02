@@ -4,11 +4,11 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
-End-to-end analytics platform on a real, public e-commerce dataset: builds
-a customer conversion funnel, measures where customers drop off, and
-evaluates a 3-arm onboarding/checkout experiment (Control / Variant_A /
-Variant_B) — including a hard look at two real data-quality issues in the
-source data that would have quietly produced a wrong analysis if ignored.
+End-to-end analytics platform on a real, public e-commerce dataset: a
+customer conversion funnel, a 3-arm onboarding/checkout experiment
+(Control / Variant_A / Variant_B), and two real data-quality issues in
+the source data that needed to be caught and worked around before either
+analysis would mean anything.
 
 Built by **[Rohith Sure](https://github.com/rohithsure2000)** — Data
 Analyst / Data Scientist (MS Data Science, Stevens Institute of Technology).
@@ -57,13 +57,13 @@ add_to_cart / bounce / purchase) across 2021–2023.
 
 The raw CSVs aren't committed to this repo (`events.csv` alone is
 ~180MB) — see [`data/README.md`](data/README.md) for the download link,
-citation, and setup steps.
+full citation, and setup steps.
 
 ## Two data-quality findings that shaped this project
 
-Both of these were caught by checking the data rather than assuming it
-behaved the way its column names suggested — worth reading since they
-directly determined how the funnel and the experiment are analyzed below.
+Both were caught by checking the data instead of trusting the column
+names, and they directly shaped how the funnel and the experiment are
+analyzed below.
 
 **1. `session_id` isn't a real visit identifier.** 84% of session*id
 values are shared across \_multiple different customers*, sometimes years
@@ -280,16 +280,13 @@ Once the pipeline has run, `data/processed/warehouse.db` is a plain SQLite
 file — open it with any SQLite client and run the queries in
 `sql/funnel_queries.sql` directly, or adapt them for Snowflake.
 
-## Connecting a real BI tool
+## Connecting Tableau / Power BI instead
 
-This repo includes a Streamlit dashboard so it's runnable end-to-end
-without a BI license. To point **Tableau** or **Power BI** at the same
-data instead:
-
-- Point either tool's SQLite/ODBC connector at `data/processed/warehouse.db`, or
-- In production (`DB_BACKEND=snowflake`), connect Tableau/Power BI's native
-  Snowflake connector to the same tables and reuse `sql/funnel_queries.sql`
-  as the basis for calculated fields.
+The Streamlit dashboard covers the interactive use case, but the
+warehouse is just SQLite (or Snowflake in production) underneath —
+either BI tool's native connector can point at `data/processed/warehouse.db`
+directly, and `sql/funnel_queries.sql` is a reasonable starting point for
+calculated fields.
 
 ## Design decisions / what I'd add next
 
@@ -311,11 +308,7 @@ data instead:
   webhook/email so a scheduled job could flag a funnel-stage regression
   automatically.
 
-## Dataset citation
-
-> Geetha Sagar Bonthu. (2025). Marketing & E-Commerce Analytics Dataset [Dataset]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/13964291
-
 ## License
 
 Code in this repo: MIT — see [LICENSE](LICENSE). Dataset: CC0 (public
-domain), per the Kaggle listing.
+domain) — see [`data/README.md`](data/README.md) for the source and citation.

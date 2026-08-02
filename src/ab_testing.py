@@ -3,21 +3,18 @@ ab_testing.py
 -------------
 Evaluates the Control / Variant_A / Variant_B experiment_group field.
 
-Methodology note (see data/README.md for how we confirmed this):
-`experiment_group` is assigned independently per *event*, not persisted
-per customer -- 99.96% of customers see more than one group across their
-history. That means a standard two-proportion z-test at the event level
-technically violates the independence assumption (events from the same
-customer aren't independent draws). Rather than ignore that, this module:
+`experiment_group` is assigned per *event*, not persisted per customer --
+99.96% of customers see more than one group across their history (see
+data/README.md). A plain two-proportion z-test at the event level
+technically violates independence (events from the same customer aren't
+independent draws), so this module does two things:
 
-  1. Runs the headline test at the event level (chi-square across all
-     3 groups, then pairwise z-tests with a Bonferroni correction), which
-     is what the data actually supports treating as the unit of analysis.
-  2. Cross-checks the result with a customer-clustered bootstrap: resample
-     *customers* (not events) with replacement, so any within-customer
-     correlation is preserved in the resampling rather than assumed away.
-     If the two approaches agree, that's good evidence the effect isn't
-     an artifact of pseudo-replication.
+  1. Headline test at the event level -- chi-square across all 3 groups,
+     then pairwise z-tests with a Bonferroni correction.
+  2. Cross-check via a customer-clustered bootstrap: resample customers
+     (not events), so within-customer correlation is preserved instead of
+     assumed away. Agreement between the two is evidence the effect isn't
+     a pseudo-replication artifact.
 
 Run:
     python -m src.ab_testing

@@ -54,7 +54,7 @@ def test_bounce_is_not_a_funnel_step(toy_events):
     reach = customer_step_reach(toy_events)
     # customer 5 bounced and should NOT show as having reached any step
     # beyond 'view'
-    assert reach.loc[5, "view"] is True or reach.loc[5, "view"] == True  # noqa: E712
+    assert reach.loc[5, "view"] == True  # noqa: E712
     assert reach.loc[5, "click"] == False  # noqa: E712
 
 

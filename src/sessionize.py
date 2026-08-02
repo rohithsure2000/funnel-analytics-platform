@@ -1,16 +1,14 @@
 """
 sessionize.py
 -------------
-The source `session_id` field in events.csv turns out not to be a
-trustworthy single-visit key (see data/README.md for how we confirmed
-that -- the same session_id shows up across different customers and
-across dates years apart).
+The source `session_id` field in events.csv isn't a trustworthy
+single-visit key -- the same value shows up across different customers
+and across dates years apart (see data/README.md).
 
-This module derives real sessions from timestamps instead, using the
-standard web-analytics "inactivity gap" method: within a single
-customer's event history, a new session starts whenever the gap since
-their previous event exceeds `gap_minutes` (30 minutes by default, a
-common industry default -- e.g. Google Analytics uses the same value).
+This derives real sessions from timestamps instead: within one
+customer's history, a new session starts whenever the gap since their
+last event exceeds `gap_minutes` (30 min default -- Google Analytics
+uses the same threshold).
 """
 
 import pandas as pd
@@ -39,10 +37,9 @@ def build_sessions(events: pd.DataFrame, gap_minutes: int = DEFAULT_GAP_MINUTES)
 
 def session_summary(sessioned_events: pd.DataFrame) -> pd.DataFrame:
     """One row per derived session: customer, start/end time, event count,
-    number of distinct event types, and whether it reached each key step.
-    Useful for sanity-checking the sessionization (session length
-    distribution should look like real browsing sessions, not years-long
-    spans)."""
+    and duration. Useful for sanity-checking the sessionization -- the
+    duration distribution should look like real browsing sessions, not
+    years-long spans."""
     g = sessioned_events.groupby("derived_session_id")
     summary = g.agg(
         customer_id=("customer_id", "first"),

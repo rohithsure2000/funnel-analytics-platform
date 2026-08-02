@@ -22,7 +22,7 @@ jobs:
 
       # Unit tests use hand-crafted fixtures (see tests/), not the real
       # dataset, so they run without downloading anything -- the real
-      # dataset is real, licensed Kaggle data (see data/README.md) that
-      # isn't vendored into this repo or CI.
+      # dataset is licensed Kaggle data (see data/README.md) that isn't
+      # vendored into this repo or CI.
       - name: Run tests
         run: pytest -v

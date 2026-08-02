@@ -44,8 +44,8 @@ data/raw/
 | `events.csv` | 2,000,000 | one row per user interaction (view/click/add_to_cart/bounce/purchase) |
 
 Two real data-quality quirks in `events.csv` that this project handles
-explicitly rather than glossing over (see the main README's "Design
-decisions" section for the reasoning):
+explicitly rather than glossing over (see the main README's "Two
+data-quality findings" section for the full reasoning):
 
 - `session_id` is not a reliable single-visit identifier — the same value
   frequently appears across different customers and across dates years

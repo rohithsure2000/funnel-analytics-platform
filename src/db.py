@@ -1,20 +1,15 @@
 """
 db.py
 -----
-Connection helper for the funnel analytics platform.
+Connection helper. Two backends:
 
-Two backends are supported:
+  * sqlite (default) -- local file at data/processed/warehouse.db, no
+    credentials needed.
+  * snowflake (production) -- set DB_BACKEND=snowflake and the
+    SNOWFLAKE_* env vars (see .env.example). Needs
+    `snowflake-connector-python`.
 
-  * sqlite (default, used for local development / this demo): a local
-    file-based warehouse at data/processed/warehouse.db. No credentials
-    required, works out of the box.
-
-  * snowflake (production): set DB_BACKEND=snowflake and the SNOWFLAKE_*
-    environment variables (see .env.example). Requires the optional
-    `snowflake-connector-python` dependency.
-
-Application code should import `get_connection()` and not care which
-backend is active.
+Everything else imports get_connection() and doesn't care which is active.
 """
 
 import os

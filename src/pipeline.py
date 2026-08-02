@@ -1,11 +1,9 @@
 """
 pipeline.py
 -----------
-ETL pipeline for the real Marketing & E-Commerce Analytics dataset (see
-data/README.md). Reads the five raw CSVs, validates and cleans them,
-derives real sessions (see src/sessionize.py), and loads everything into
-the warehouse (dim_customers, dim_products, dim_campaigns,
-fct_transactions, fct_events).
+ETL for the Marketing & E-Commerce Analytics dataset (see data/README.md).
+Reads the five raw CSVs, validates/cleans them, derives sessions
+(src/sessionize.py), and loads everything into the warehouse.
 
 Run:
     python -m src.pipeline
@@ -77,17 +75,15 @@ def load_transactions(valid_customers: set, valid_products: set) -> pd.DataFrame
         logger.warning("transactions: dropping %d rows with unknown customer_id", orphaned.sum())
         df = df[~orphaned]
 
-    # product_id / gross_revenue are legitimately null for ~10% of rows in
-    # the source (paired missingness). Keep the rows -- a missing product
-    # or revenue figure is still a real transaction -- but flag them
-    # rather than silently imputing a number.
+    # product_id / gross_revenue are null together for ~10% of rows in the
+    # source. Keep the rows (still a real transaction) but flag them
+    # instead of imputing a number.
     df["has_missing_product_or_revenue"] = df["product_id"].isna() | df["gross_revenue"].isna()
 
-    # 325 rows in the source have refund_flag=1 but non-negative revenue,
-    # inconsistent with the documented convention (refunds are negative
-    # revenue). We trust refund_flag as the source of truth since it's an
-    # explicit boolean rather than inferring from sign, and flag the
-    # mismatch for transparency.
+    # 325 rows have refund_flag=1 but non-negative revenue -- inconsistent
+    # with the usual convention (refunds should be negative). Trusting
+    # refund_flag over the sign here since it's the explicit field; flag
+    # the mismatch rather than silently picking one.
     df["revenue_sign_mismatch"] = (df["refund_flag"] == 1) & (df["gross_revenue"].fillna(0) >= 0)
 
     df["has_missing_product_or_revenue"] = df["has_missing_product_or_revenue"].astype(int)
@@ -147,13 +143,21 @@ def load_to_warehouse(customers, products, campaigns, transactions, events) -> N
         "fct_events": events,
     }
 
+    # Delete children before parents (fct_* reference dim_*, and foreign
+    # keys are enforced -- deleting a parent while a child still points at
+    # it fails). Load in the opposite order so each insert's foreign key
+    # already exists.
+    delete_order = ["fct_events", "fct_transactions", "dim_customers", "dim_products", "dim_campaigns"]
+    load_order = ["dim_customers", "dim_products", "dim_campaigns", "fct_transactions", "fct_events"]
+
     with get_connection() as conn:
-        for table_name, df in tables.items():
-            # Clear existing rows rather than DROP+recreate (to_sql's
-            # if_exists='replace' would drop the table and silently lose
-            # the indexes/PK constraints defined in schema.sql).
+        # Clear rows instead of drop+recreate -- to_sql's if_exists='replace'
+        # would drop the table and lose the indexes/PK constraints from
+        # schema.sql.
+        for table_name in delete_order:
             conn.execute(f"DELETE FROM {table_name}")
-            df.to_sql(table_name, conn, if_exists="append", index=False, chunksize=10_000)
+        for table_name in load_order:
+            tables[table_name].to_sql(table_name, conn, if_exists="append", index=False, chunksize=10_000)
         conn.commit()
 
     logger.info(

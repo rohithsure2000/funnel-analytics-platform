@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # This project runs on a real, licensed Kaggle dataset that is NOT bundled
-# in this image (see data/README.md for the download link + citation).
+# in this image (see data/README.md for the download link).
 # Mount your downloaded CSVs into /app/data/raw before running, e.g.:
 #
 #   docker build -t funnel-analytics .

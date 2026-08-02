@@ -2,18 +2,17 @@
 export_demo_data.py
 --------------------
 Exports small, precomputed result tables to dashboard/demo_data/ so the
-dashboard can run in "demo mode" without the real dataset present --
-e.g. for a Streamlit Community Cloud deployment, where bundling the real
-~200MB licensed dataset isn't practical or appropriate.
+dashboard can run in "demo mode" without the real dataset present (e.g.
+a Streamlit Community Cloud deployment, where bundling the ~200MB
+licensed dataset isn't practical).
 
-This does NOT replace the real pipeline -- it's a snapshot of results
-*produced by* the real pipeline, for display purposes only. Run it once,
-locally, after `python -m src.pipeline` has populated the real warehouse:
+This is a snapshot of results *produced by* the real pipeline, not a
+replacement for it. Run once, locally, after `python -m src.pipeline`:
 
     python -m src.export_demo_data
 
-The output files are small (a few KB total) and are committed to the
-repo, unlike the raw CSVs / warehouse.db.
+Output is a few KB total and gets committed to the repo, unlike the raw
+CSVs / warehouse.db.
 """
 
 import json
