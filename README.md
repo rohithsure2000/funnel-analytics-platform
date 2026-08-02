@@ -1,4 +1,4 @@
-# Marketing Funnel & Experiment Analytics
+# Marketing Funnel & A/B Testing Platform
 
 ![CI](https://github.com/rohithsure2000/funnel-analytics-platform/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -10,8 +10,7 @@ customer conversion funnel, a 3-arm onboarding/checkout experiment
 the source data that needed to be caught and worked around before either
 analysis would mean anything.
 
-Built by **[Rohith Sure](https://github.com/rohithsure2000)** — Data
-Analyst / Data Scientist (MS Data Science, Stevens Institute of Technology).
+Built by **[Rohith Sure](https://github.com/rohithsure2000)**
 
 **Live demo:** [funnel-analytics-platform-9khfvyseacab88ff8wfshk.streamlit.app](https://funnel-analytics-platform-9khfvyseacab88ff8wfshk.streamlit.app)
 
@@ -56,7 +55,7 @@ this analysis are below.
 add_to_cart / bounce / purchase) across 2021–2023.
 
 The raw CSVs aren't committed to this repo (`events.csv` alone is
-~180MB) — see [`data/README.md`](data/README.md) for the download link,
+~180MB), see [`data/README.md`](data/README.md) for the download link,
 full citation, and setup steps.
 
 ## Two data-quality findings that shaped this project
@@ -69,13 +68,13 @@ analyzed below.
 values are shared across \_multiple different customers*, sometimes years
 apart. I tried deriving real sessions from timestamps instead (a standard
 technique: a new session starts after a 30-minute gap in a customer's
-activity — see `src/sessionize.py`), and found the data doesn't actually
+activity, see `src/sessionize.py`), and found the data doesn't actually
 support that either: **the median gap between a customer's consecutive
 events is 36 days**, and only 0.04% of gaps are under 30 minutes. There's
 no visit-clustered behavior to recover here. So instead of forcing a
 session-based funnel the data can't support, this project measures a
-**customer lifecycle funnel** — across a customer's entire history, did
-they ever reach each stage — which is a standard and honest way to frame
+**customer lifecycle funnel**, across a customer's entire history, did
+they ever reach each stage, which is a standard and honest way to frame
 a funnel when session data isn't trustworthy.
 
 **2. `experiment_group` is assigned per _event_, not per _customer_.**
@@ -83,7 +82,7 @@ a funnel when session data isn't trustworthy.
 event history, so it can't be read as a traditional sticky A/B cohort.
 Rather than either ignoring this or discarding the field, this project
 tests it at the event level (the unit the data actually supports) and then
-cross-checks that result with a **customer-clustered bootstrap** —
+cross-checks that result with a **customer-clustered bootstrap**,
 resampling customers, not events, so any within-customer correlation is
 preserved rather than assumed away. The two approaches agree closely,
 which is real evidence the effect isn't a pseudo-replication artifact.
@@ -108,7 +107,7 @@ flowchart LR
 The warehouse defaults to a local **SQLite** file so the whole thing runs
 with zero setup beyond downloading the CSVs. Swap `DB_BACKEND=snowflake`
 and set the `SNOWFLAKE_*` variables in `.env` to point the exact same
-pipeline and queries at a real Snowflake warehouse — no code changes
+pipeline and queries at a real Snowflake warehouse, no code changes
 required (see `src/db.py`).
 
 ## Results (from this repo's pipeline, run against the real dataset)
@@ -124,13 +123,13 @@ required (see `src/db.py`).
 
 Bounce rate (share of all events that are `bounce`): **9.5%**. Average
 lifetime revenue per converted customer: **$146.31**. The steepest
-drop-off by far is cart → purchase — nearly a third of customers who add
+drop-off by far is cart → purchase, nearly a third of customers who add
 something to their cart never complete a purchase.
 
 ![Ever-purchased rate by channel](reports/figures/channel_conversion.png)
 
 Channel doesn't differentiate much here (63.5%–64.3% across all five
-acquisition channels) — a genuinely flat result, not a rounding artifact.
+acquisition channels), a genuinely flat result, not a rounding artifact.
 
 ### Experiment: Control vs. Variant_A vs. Variant_B
 
@@ -202,7 +201,7 @@ funnel-analytics-platform/
 ### Prerequisites
 
 - Python 3.11+
-- The dataset — see [`data/README.md`](data/README.md) for the download
+- The dataset, see [`data/README.md`](data/README.md) for the download
   link and setup (not included in this repo)
 - (optional) Docker
 - (optional) R with the `DBI` and `RSQLite` packages, if you want to run
@@ -241,7 +240,7 @@ streamlit run dashboard/app.py
 If `data/processed/warehouse.db` exists (i.e. you've run the pipeline),
 the dashboard queries it live. Otherwise it automatically falls back to
 the precomputed results in `dashboard/demo_data/` and shows a banner
-saying so — this is what makes the cloud deployment below possible
+saying so, this is what makes the cloud deployment below possible
 without bundling the real ~200MB dataset.
 
 ### Deploying the live demo
@@ -251,7 +250,7 @@ no local warehouse, it can be deployed as-is to
 [Streamlit Community Cloud](https://streamlit.io/cloud) (free) without
 needing the real dataset present in the cloud environment:
 
-1. Push this repo to GitHub (steps below, if not done yet).
+1. Push this repo to GitHub (steps below).
 2. Go to share.streamlit.io, sign in with GitHub, click "New app."
 3. Point it at this repo, branch `main`, file path `dashboard/app.py`.
 4. Deploy. It'll show the demo-mode banner and the precomputed real results.
@@ -277,26 +276,25 @@ without downloading anything.
 ### Query it directly
 
 Once the pipeline has run, `data/processed/warehouse.db` is a plain SQLite
-file — open it with any SQLite client and run the queries in
+file, open it with any SQLite client and run the queries in
 `sql/funnel_queries.sql` directly, or adapt them for Snowflake.
 
 ## Connecting Tableau / Power BI instead
 
 The Streamlit dashboard covers the interactive use case, but the
-warehouse is just SQLite (or Snowflake in production) underneath —
+warehouse is just SQLite (or Snowflake in production) underneath,
 either BI tool's native connector can point at `data/processed/warehouse.db`
 directly, and `sql/funnel_queries.sql` is a reasonable starting point for
 calculated fields.
 
 ## Design decisions / what I'd add next
 
-- **Funnel grain:** deliberately a lifecycle funnel, not a per-visit one
-  — see "Two data-quality findings" above for why. A dataset with real
+- **Funnel grain:** deliberately a lifecycle funnel, not a per-visit one, see "Two data-quality findings" above for why. A dataset with real
   session clustering would make a per-visit funnel (and the sessionization
   code already here) the better choice.
 - **A/B test caveat:** the event-level p-values technically overstate
   precision slightly, since not every event is a fully independent draw
-  in the strictest sense — that's exactly why the clustered bootstrap is
+  in the strictest sense, that's exactly why the clustered bootstrap is
   included as a check rather than reporting the naive test alone.
 - **Sample ratio check:** worth adding a formal SRM (sample ratio
   mismatch) test on the 60/20/20 split before trusting any lift number in
@@ -310,5 +308,5 @@ calculated fields.
 
 ## License
 
-Code in this repo: MIT — see [LICENSE](LICENSE). Dataset: CC0 (public
-domain) — see [`data/README.md`](data/README.md) for the source and citation.
+Code in this repo: MIT, [LICENSE](LICENSE).
+Dataset: CC0 (public domain), see [`data/README.md`](data/README.md) for the source and citation.
